@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  --color-midnight: #0a0e1a;
+  --color-midnight-2: #0f1525;
+  --color-surface: #141b2e;
+  --color-surface-2: #1b2440;
+  --color-line: #26304d;
+  --color-pitch: #18c98b;
+  --color-pitch-bright: #34e6a3;
+  --color-gold: #f7c948;
+  --color-gold-deep: #d99e1f;
+  --color-silver: #c7d0dd;
+  --color-bronze: #cd7f4b;
+  --color-ink: #e8edf6;
+  --color-ink-dim: #9aa6bd;
+  --color-ink-faint: #6b7793;
+
+  --font-display: var(--font-geist-sans);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background-color: var(--color-midnight);
+  color: var(--color-ink);
+}
+
+body {
+  background-image:
+    radial-gradient(1100px 600px at 12% -10%, rgba(24, 201, 139, 0.10), transparent 60%),
+    radial-gradient(900px 500px at 98% 0%, rgba(247, 201, 72, 0.08), transparent 55%),
+    radial-gradient(700px 700px at 50% 120%, rgba(56, 120, 255, 0.06), transparent 60%);
+  background-attachment: fixed;
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
+/* Thin, themed scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.live-dot {
+  animation: pulse-live 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-surface-2) 37%, var(--color-surface) 63%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rise {
+  animation: rise 0.35s ease-out both;
+}
+
+.text-gradient {
+  background: linear-gradient(95deg, var(--color-pitch-bright), var(--color-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card {
+  background-color: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
+  backdrop-filter: blur(6px);
+}
