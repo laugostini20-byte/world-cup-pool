@@ -159,14 +159,13 @@ export function TeamModal({
                     <div className="text-[10px] uppercase tracking-wider text-ink-faint mb-1">
                       {g.label}
                     </div>
-                    <ul className="grid grid-cols-2 gap-x-3 gap-y-1">
+                    <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5">
                       {g.players.map((p) => (
                         <li key={p.name} className="flex items-center gap-2 text-sm">
-                          <span className="w-5 text-right text-ink-faint tabular-nums text-xs">
-                            {p.jersey}
+                          <span className="w-6 h-6 shrink-0 grid place-items-center rounded-md bg-surface-2 border border-line text-[11px] font-semibold tabular-nums text-ink-dim">
+                            {p.jersey || "–"}
                           </span>
                           <span className="truncate">{p.name}</span>
-                          {p.age && <span className="text-[10px] text-ink-faint ml-auto">{p.age}</span>}
                         </li>
                       ))}
                     </ul>
