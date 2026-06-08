@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { SoccerBall } from "./SoccerBall";
 
 type Phase = "pending" | "playing" | "leaving" | "done";
 
@@ -26,8 +27,8 @@ export function IntroAnimation() {
     setPhase("playing");
     sessionStorage.setItem(SESSION_KEY, "1");
 
-    const toLeaving = setTimeout(() => setPhase("leaving"), 1850);
-    const toDone = setTimeout(() => setPhase("done"), 2300);
+    const toLeaving = setTimeout(() => setPhase("leaving"), 1950);
+    const toDone = setTimeout(() => setPhase("done"), 2550);
     return () => {
       clearTimeout(toLeaving);
       clearTimeout(toDone);
@@ -53,6 +54,9 @@ export function IntroAnimation() {
         <div className="mt-2 text-sm sm:text-base uppercase tracking-[0.5em] text-ink-faint">
           2026
         </div>
+      </div>
+      <div className="intro-ball">
+        <SoccerBall size={72} />
       </div>
       <button
         onClick={skip}

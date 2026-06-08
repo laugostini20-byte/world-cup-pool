@@ -139,8 +139,60 @@ body {
   animation: intro-sweep 1.7s ease-in-out both;
 }
 
+/* Soccer ball: rolls in spinning, idles, then gets kicked off-screen on exit. */
+.intro-ball {
+  --ball-y: 148px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -36px;
+  margin-top: -36px;
+  animation:
+    ball-roll-in 1s cubic-bezier(0.18, 0.7, 0.3, 1) both,
+    ball-idle 2.2s ease-in-out 1.05s infinite;
+  will-change: transform;
+}
+.intro-ball::after {
+  content: "";
+  position: absolute;
+  right: 50%;
+  top: 50%;
+  width: 140px;
+  height: 7px;
+  transform-origin: right center;
+  transform: translateY(-50%) rotate(34deg) scaleX(0);
+  background: linear-gradient(to left, rgba(238, 243, 251, 0.55), transparent);
+  border-radius: 9999px;
+  opacity: 0;
+}
+@keyframes ball-roll-in {
+  0% { transform: translate(-130vw, var(--ball-y)) rotate(-1080deg); }
+  100% { transform: translate(0, var(--ball-y)) rotate(0deg); }
+}
+@keyframes ball-idle {
+  0%, 100% { transform: translate(0, var(--ball-y)) rotate(-5deg); }
+  50% { transform: translate(0, calc(var(--ball-y) - 7px)) rotate(5deg); }
+}
+@keyframes ball-kick {
+  0% { transform: translate(0, var(--ball-y)) rotate(0deg); }
+  16% { transform: translate(-10px, calc(var(--ball-y) + 3px)) rotate(-14deg); }
+  100% { transform: translate(128vw, -96vh) rotate(1640deg); filter: blur(1.5px); }
+}
+@keyframes ball-streak {
+  0% { transform: translateY(-50%) rotate(34deg) scaleX(0); opacity: 0.6; }
+  100% { transform: translateY(-50%) rotate(34deg) scaleX(1); opacity: 0; }
+}
+.intro-overlay.leaving .intro-ball {
+  animation: ball-kick 0.62s cubic-bezier(0.5, 0, 0.85, 0.35) forwards;
+}
+.intro-overlay.leaving .intro-ball::after {
+  animation: ball-streak 0.55s ease-in forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .intro-mark, .intro-trophy, .intro-sweep::after { animation: none; }
+  .intro-mark, .intro-trophy, .intro-sweep::after,
+  .intro-ball, .intro-ball::after { animation: none; }
+  .intro-ball { transform: translate(0, var(--ball-y)); }
 }
 
 .card {
