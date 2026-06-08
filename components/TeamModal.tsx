@@ -102,9 +102,9 @@ export function TeamModal({
               <p className="text-xs text-ink-dim mt-0.5">
                 Group {team.tier} · FIFA #{team.fifaRank} · {team.odds} to win
               </p>
-              <p className="text-xs text-pitch-bright mt-0.5">
-                {detail?.standingSummary || status.label}
-              </p>
+              {status.label !== "Not started" && (
+                <p className="text-xs text-pitch-bright mt-0.5">{status.label}</p>
+              )}
             </div>
             <button
               onClick={onClose}
