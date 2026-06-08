@@ -1,4 +1,12 @@
-import type { Match, MatchSide, RoundKey, RoundWindow, TeamState } from "./types";
+import type {
+  Match,
+  MatchSide,
+  RoundKey,
+  RoundWindow,
+  SquadPlayer,
+  TeamDetail,
+  TeamState,
+} from "./types";
 
 const BASE = "https://site.api.espn.com/apis";
 const LEAGUE = "soccer/fifa.world";
@@ -131,6 +139,40 @@ export async function getAllMatches(windows: RoundWindow[]): Promise<Match[]> {
 
 const ROUND_SEQUENCE: RoundKey[] = ["group", "r32", "r16", "qf", "sf", "third", "final"];
 export const roundOrder = (r: RoundKey) => ROUND_SEQUENCE.indexOf(r);
+
+/** Fetch a single team's detail (identity, standing, full squad, coach) from ESPN. */
+export async function getTeamDetail(id: string): Promise<TeamDetail | null> {
+  const [info, roster] = await Promise.all([
+    getJson<any>(`${BASE}/site/v2/sports/${LEAGUE}/teams/${id}`),
+    getJson<any>(`${BASE}/site/v2/sports/${LEAGUE}/teams/${id}/roster`),
+  ]);
+
+  const t = info?.team;
+  const squad: SquadPlayer[] = (roster?.athletes ?? []).map((a: any) => ({
+    name: a.displayName ?? a.fullName ?? "",
+    jersey: a.jersey ?? "",
+    position: a.position?.abbreviation ?? "",
+    positionName: a.position?.name ?? "",
+    age: typeof a.age === "number" ? a.age : null,
+  }));
+
+  const coachRaw = Array.isArray(roster?.coach) ? roster.coach[0] : roster?.coach;
+  const coach = coachRaw
+    ? `${coachRaw.firstName ?? ""} ${coachRaw.lastName ?? ""}`.trim() || undefined
+    : undefined;
+
+  if (!t && squad.length === 0) return null;
+
+  return {
+    espnId: id,
+    displayName: t?.displayName ?? "",
+    logo: t?.logos?.[0]?.href,
+    color: t?.color,
+    standingSummary: t?.standingSummary,
+    coach,
+    squad,
+  };
+}
 
 /** Fetch real WC group standings, keyed by ESPN team id. */
 export async function getStandings(): Promise<Record<string, Partial<TeamState>>> {

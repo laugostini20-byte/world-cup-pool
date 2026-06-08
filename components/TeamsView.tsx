@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { Scoreboard } from "@/lib/types";
-import { POOL_TEAMS, tiers } from "@/data/teams";
+import { POOL_TEAMS, tiers, type PoolTeam } from "@/data/teams";
 import { useScoreboard } from "@/lib/useScoreboard";
 import { teamStatus, type StatusTone } from "@/lib/format";
 import { RefreshBar } from "./RefreshBar";
+import { TeamModal } from "./TeamModal";
 
 const DOT: Record<StatusTone, string> = {
   champion: "bg-gold",
@@ -16,6 +17,7 @@ const DOT: Record<StatusTone, string> = {
 
 export function TeamsView({ initialBoard }: { initialBoard: Scoreboard }) {
   const { board, refreshing, refresh } = useScoreboard(initialBoard);
+  const [selected, setSelected] = useState<PoolTeam | null>(null);
 
   const pickedBy = useMemo(() => {
     const map: Record<string, string[]> = {};
@@ -60,7 +62,11 @@ export function TeamsView({ initialBoard }: { initialBoard: Scoreboard }) {
                 const status = teamStatus(state);
                 const fans = pickedBy[team.espnId]?.length ?? 0;
                 return (
-                  <div key={team.espnId} className="card p-3">
+                  <button
+                    key={team.espnId}
+                    onClick={() => setSelected(team)}
+                    className="card p-3 text-left hover:border-pitch/50 hover:bg-surface-2/40 transition-colors"
+                  >
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-semibold text-sm truncate">{team.name}</span>
                       <span className="text-[10px] text-ink-faint shrink-0">{team.odds}</span>
@@ -77,13 +83,22 @@ export function TeamsView({ initialBoard }: { initialBoard: Scoreboard }) {
                     <div className="text-[11px] text-pitch-bright mt-1.5">
                       {fans} {fans === 1 ? "entry" : "entries"} picked
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
           </section>
         ))}
       </div>
+
+      {selected && (
+        <TeamModal
+          team={selected}
+          state={board.teamStates[selected.espnId]}
+          pickedBy={pickedBy[selected.espnId] ?? []}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </div>
   );
 }
