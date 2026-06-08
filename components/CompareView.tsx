@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { Scoreboard, ScoredParticipant, ScoredPick } from "@/lib/types";
 import { useScoreboard } from "@/lib/useScoreboard";
 import { RefreshBar } from "./RefreshBar";
+import { SearchableSelect } from "./SearchableSelect";
 
 export function CompareView({ initialBoard }: { initialBoard: Scoreboard }) {
   const { board, refreshing, refresh } = useScoreboard(initialBoard);
@@ -14,6 +15,7 @@ export function CompareView({ initialBoard }: { initialBoard: Scoreboard }) {
 
   const a = people.find((p) => p.id === idA);
   const b = people.find((p) => p.id === idB);
+  const options = people.map((p) => ({ id: p.id, label: p.name }));
 
   return (
     <div>
@@ -28,36 +30,12 @@ export function CompareView({ initialBoard }: { initialBoard: Scoreboard }) {
       </div>
 
       <div className="grid grid-cols-2 gap-2 mb-4">
-        <PersonPicker value={idA} onChange={setIdA} people={people} />
-        <PersonPicker value={idB} onChange={setIdB} people={people} />
+        <SearchableSelect value={idA} onChange={setIdA} options={options} placeholder="Search entries…" />
+        <SearchableSelect value={idB} onChange={setIdB} options={options} placeholder="Search entries…" />
       </div>
 
       {a && b ? <Comparison a={a} b={b} /> : <p className="text-ink-faint text-sm">Pick two entries.</p>}
     </div>
-  );
-}
-
-function PersonPicker({
-  value,
-  onChange,
-  people,
-}: {
-  value: string;
-  onChange: (id: string) => void;
-  people: ScoredParticipant[];
-}) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded-xl bg-surface border border-line px-3 py-2.5 text-sm outline-none focus:border-pitch transition-colors"
-    >
-      {people.map((p) => (
-        <option key={p.id} value={p.id}>
-          {p.name}
-        </option>
-      ))}
-    </select>
   );
 }
 
