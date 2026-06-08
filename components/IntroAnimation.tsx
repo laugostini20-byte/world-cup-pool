@@ -50,8 +50,8 @@ export function IntroAnimation() {
           <div className="intro-line text-2xl sm:text-4xl text-ink">WORLD CUP</div>
           <div className="intro-line text-4xl sm:text-6xl text-gradient">POOL</div>
         </div>
-        <div className="mt-2 text-[11px] sm:text-xs uppercase tracking-[0.4em] text-ink-faint">
-          2026 · Live Scoring
+        <div className="mt-2 text-sm sm:text-base uppercase tracking-[0.5em] text-ink-faint">
+          2026
         </div>
       </div>
       <button
