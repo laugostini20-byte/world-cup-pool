@@ -1,4 +1,6 @@
 import type {
+  GroupRow,
+  GroupTable,
   Match,
   MatchSide,
   RoundKey,
@@ -172,6 +174,40 @@ export async function getTeamDetail(id: string): Promise<TeamDetail | null> {
     coach,
     squad,
   };
+}
+
+/** Fetch the real WC group tables (A–L) with full standings for display. */
+export async function getGroupTables(): Promise<GroupTable[]> {
+  const data = await getJson<any>(`${BASE}/v2/sports/${LEAGUE}/standings`);
+  const groups = data?.children ?? [];
+  const tables: GroupTable[] = [];
+  for (const g of groups) {
+    const entries = g?.standings?.entries ?? [];
+    const rows: GroupRow[] = entries.map((e: any) => {
+      const stat = (name: string) =>
+        Number(e.stats?.find((s: any) => s.type === name)?.value ?? 0);
+      const t = e.team;
+      return {
+        espnId: String(t?.id ?? ""),
+        name: t?.displayName ?? t?.name ?? "",
+        abbr: t?.abbreviation ?? "",
+        logo: t?.logos?.[0]?.href,
+        played: stat("gamesplayed"),
+        wins: stat("wins"),
+        draws: stat("ties"),
+        losses: stat("losses"),
+        gf: stat("pointsfor"),
+        ga: stat("pointsagainst"),
+        gd: stat("pointdifferential"),
+        points: stat("points"),
+        rank: stat("rank"),
+        advanced: stat("advanced") > 0,
+      };
+    });
+    rows.sort((a, b) => (a.rank || 99) - (b.rank || 99));
+    tables.push({ name: g?.name ?? g?.abbreviation ?? "", rows });
+  }
+  return tables;
 }
 
 /** Fetch real WC group standings, keyed by ESPN team id. */

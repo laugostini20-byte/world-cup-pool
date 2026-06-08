@@ -106,6 +106,28 @@ export interface TeamDetail {
   squad: SquadPlayer[];
 }
 
+export interface GroupRow {
+  espnId: string;
+  name: string;
+  abbr: string;
+  logo?: string;
+  played: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  gf: number;
+  ga: number;
+  gd: number;
+  points: number;
+  rank: number;
+  advanced: boolean;
+}
+
+export interface GroupTable {
+  name: string; // e.g. "Group A"
+  rows: GroupRow[];
+}
+
 export interface Scoreboard {
   updatedAt: string;
   tournamentStarted: boolean;
