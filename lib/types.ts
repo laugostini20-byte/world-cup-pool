@@ -88,6 +88,24 @@ export interface ScoredParticipant {
   picks: ScoredPick[];
 }
 
+export interface SquadPlayer {
+  name: string;
+  jersey: string;
+  position: string; // abbreviation: G/D/M/F
+  positionName: string;
+  age: number | null;
+}
+
+export interface TeamDetail {
+  espnId: string;
+  displayName: string;
+  logo?: string;
+  color?: string; // hex without '#'
+  standingSummary?: string; // e.g. "1st in FIFA World Cup"
+  coach?: string;
+  squad: SquadPlayer[];
+}
+
 export interface Scoreboard {
   updatedAt: string;
   tournamentStarted: boolean;
