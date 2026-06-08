@@ -77,6 +77,72 @@ body {
   color: transparent;
 }
 
+/* ── Intro animation ─────────────────────────────────────────────── */
+@keyframes intro-zoom {
+  0% { transform: scale(0.12); opacity: 0; filter: blur(10px); }
+  30% { opacity: 1; filter: blur(0); }
+  78% { transform: scale(1); }
+  100% { transform: scale(1.06); opacity: 1; }
+}
+@keyframes intro-trophy-pop {
+  0%, 40% { transform: scale(0.4) rotate(-12deg); opacity: 0; }
+  70% { transform: scale(1.15) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes intro-sweep {
+  0%, 55% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+@keyframes intro-overlay-out {
+  to { opacity: 0; visibility: hidden; }
+}
+
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(1200px 700px at 50% 30%, rgba(24, 201, 139, 0.14), transparent 60%),
+    radial-gradient(900px 600px at 50% 90%, rgba(247, 201, 72, 0.10), transparent 60%),
+    var(--color-midnight);
+  overflow: hidden;
+}
+.intro-overlay.leaving {
+  animation: intro-overlay-out 0.45s ease-in forwards;
+}
+.intro-mark {
+  text-align: center;
+  animation: intro-zoom 1.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
+}
+.intro-trophy {
+  font-size: 3.5rem;
+  line-height: 1;
+  animation: intro-trophy-pop 1.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.intro-line {
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1.05;
+}
+.intro-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.intro-sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 40%, rgba(255, 255, 255, 0.35) 50%, transparent 60%);
+  animation: intro-sweep 1.7s ease-in-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-mark, .intro-trophy, .intro-sweep::after { animation: none; }
+}
+
 .card {
   background-color: color-mix(in srgb, var(--color-surface) 80%, transparent);
   border: 1px solid var(--color-line);
