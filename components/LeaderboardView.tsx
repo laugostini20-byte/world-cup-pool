@@ -9,6 +9,7 @@ import { LiveStrip } from "./LiveStrip";
 import { PickCard } from "./PickCard";
 
 const MEDAL = ["🥇", "🥈", "🥉"];
+const PAYOUT = ["$602", "$238", "$20"];
 
 export function LeaderboardView({
   initialBoard,
@@ -67,10 +68,13 @@ export function LeaderboardView({
             <button
               key={p.id}
               onClick={() => setOpen(open === p.id ? null : p.id)}
-              className={`card p-3 sm:p-4 text-left rise ${
+              className={`card p-3 sm:p-4 text-left rise relative ${
                 i === 0 ? "border-gold/40" : i === 1 ? "border-silver/30" : "border-bronze/30"
               }`}
             >
+              <span className="absolute top-2.5 right-2.5 text-xs sm:text-sm font-bold text-gold">
+                {PAYOUT[i]}
+              </span>
               <div className="text-2xl">{MEDAL[i]}</div>
               <div className="font-semibold text-sm mt-1 truncate">{p.name}</div>
               <div className={`text-2xl font-extrabold tabular-nums ${rankColor(p.rank)}`}>
