@@ -91,7 +91,11 @@ export const TEAMS_BY_ID: Record<string, PoolTeam> = Object.fromEntries(
 
 /** Lookup a pool team by its template name (case/punctuation-insensitive). Used by the importer. */
 const normalize = (s: string) =>
-  s.toLowerCase().replace(/[^a-z0-9]/g, "").replace(/^the/, "");
+  s
+    .replace(/\([^)]*\)/g, "") // drop trailing "(rank)" e.g. "France (3)"
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "")
+    .replace(/^the/, "");
 
 const BY_NORMALIZED_NAME: Record<string, PoolTeam> = (() => {
   const map: Record<string, PoolTeam> = {};
