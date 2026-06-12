@@ -133,7 +133,7 @@ export function ChatView() {
             <div ref={bottomRef} />
           </div>
 
-          {name ? (
+          {name && (
             <div className="border-t border-line p-2">
               {error && <p className="text-[11px] text-red-400 px-1 pb-1.5">{error}</p>}
               <div className="flex gap-2">
@@ -154,25 +154,35 @@ export function ChatView() {
                 </button>
               </div>
             </div>
-          ) : (
-            <div className="border-t border-line p-2 flex gap-2">
-              <input
-                value={nameDraft}
-                onChange={(e) => setNameDraft(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && saveName()}
-                maxLength={30}
-                placeholder="Enter your name to chat…"
-                className="flex-1 rounded-xl bg-surface border border-line px-3 py-2.5 text-sm outline-none focus:border-pitch placeholder:text-ink-faint"
-              />
-              <button
-                onClick={saveName}
-                disabled={!nameDraft.trim()}
-                className="px-4 rounded-xl bg-pitch/20 border border-pitch/40 text-pitch-bright font-semibold text-sm hover:bg-pitch/30 disabled:opacity-40 transition-colors"
-              >
-                Join
-              </button>
-            </div>
           )}
+        </div>
+      )}
+
+      {configured !== false && !name && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="card w-full max-w-sm p-6 text-center rise">
+            <div className="text-4xl mb-2">💬</div>
+            <h2 className="text-lg font-bold mb-1">Join the Trash Talk</h2>
+            <p className="text-sm text-ink-dim mb-4">
+              Pick a name to start chatting. Everyone in the pool will see it.
+            </p>
+            <input
+              autoFocus
+              value={nameDraft}
+              onChange={(e) => setNameDraft(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && saveName()}
+              maxLength={30}
+              placeholder="Your name"
+              className="w-full rounded-xl bg-surface border border-line px-3 py-2.5 text-sm text-center outline-none focus:border-pitch placeholder:text-ink-faint mb-3"
+            />
+            <button
+              onClick={saveName}
+              disabled={!nameDraft.trim()}
+              className="w-full px-4 py-2.5 rounded-xl bg-pitch/20 border border-pitch/40 text-pitch-bright font-semibold text-sm hover:bg-pitch/30 disabled:opacity-40 transition-colors"
+            >
+              Join the chat
+            </button>
+          </div>
         </div>
       )}
     </div>
