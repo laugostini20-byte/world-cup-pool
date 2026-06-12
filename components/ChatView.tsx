@@ -19,6 +19,7 @@ export function ChatView() {
   const [configured, setConfigured] = useState<boolean | null>(null);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const lastId = useRef(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -60,7 +61,7 @@ export function ChatView() {
     const body = draft.trim();
     if (!body || !name || sending) return;
     setSending(true);
-    setDraft("");
+    setError(null);
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -74,7 +75,13 @@ export function ChatView() {
           lastId.current = Math.max(lastId.current, message.id);
           return [...prev, message];
         });
+        setDraft(""); // only clear once it's safely saved
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Couldn't send — try again.");
       }
+    } catch {
+      setError("Couldn't send — check your connection.");
     } finally {
       setSending(false);
     }
@@ -127,22 +134,25 @@ export function ChatView() {
           </div>
 
           {name ? (
-            <div className="border-t border-line p-2 flex gap-2">
-              <input
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && send()}
-                maxLength={500}
-                placeholder="Say something…"
-                className="flex-1 rounded-xl bg-surface border border-line px-3 py-2.5 text-sm outline-none focus:border-pitch placeholder:text-ink-faint"
-              />
-              <button
-                onClick={send}
-                disabled={sending || !draft.trim()}
-                className="px-4 rounded-xl bg-pitch/20 border border-pitch/40 text-pitch-bright font-semibold text-sm hover:bg-pitch/30 disabled:opacity-40 transition-colors"
-              >
-                Send
-              </button>
+            <div className="border-t border-line p-2">
+              {error && <p className="text-[11px] text-red-400 px-1 pb-1.5">{error}</p>}
+              <div className="flex gap-2">
+                <input
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && send()}
+                  maxLength={500}
+                  placeholder="Say something…"
+                  className="flex-1 rounded-xl bg-surface border border-line px-3 py-2.5 text-sm outline-none focus:border-pitch placeholder:text-ink-faint"
+                />
+                <button
+                  onClick={send}
+                  disabled={sending || !draft.trim()}
+                  className="px-4 rounded-xl bg-pitch/20 border border-pitch/40 text-pitch-bright font-semibold text-sm hover:bg-pitch/30 disabled:opacity-40 transition-colors"
+                >
+                  Send
+                </button>
+              </div>
             </div>
           ) : (
             <div className="border-t border-line p-2 flex gap-2">
