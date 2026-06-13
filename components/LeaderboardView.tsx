@@ -9,7 +9,7 @@ import { LiveStrip } from "./LiveStrip";
 import { PickCard } from "./PickCard";
 
 const MEDAL = ["🥇", "🥈", "🥉"];
-const PAYOUT = ["$602", "$238", "$20"];
+const PAYOUT = ["$602", "$258", "$20"];
 
 export function LeaderboardView({
   initialBoard,
