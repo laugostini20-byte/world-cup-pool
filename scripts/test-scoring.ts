@@ -28,6 +28,7 @@ function baseState(over: Partial<TeamState>): TeamState {
     reached: { group: false, r32: false, r16: false, qf: false, sf: false, third: false, final: false },
     wonFinal: false,
     eliminated: false,
+    live: false,
     ...over,
   };
 }

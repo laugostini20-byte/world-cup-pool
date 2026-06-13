@@ -46,6 +46,7 @@ export function buildTeamStates(
       reached: { ...EMPTY_REACHED },
       wonFinal: false,
       eliminated: false,
+      live: false,
     };
   }
 
@@ -56,6 +57,7 @@ export function buildTeamStates(
       if (!st) continue; // team not in this pool's universe
       if (typeof side.score === "number") st.goals += side.score;
       st.reached[m.round] = true;
+      if (m.state === "in") st.live = true; // currently playing
       if (m.round === "final" && m.state === "post" && side.winner) st.wonFinal = true;
     }
   }

@@ -69,6 +69,7 @@ export function teamStatus(
     return { label: labels[furthest] ?? "Advancing", tone: "alive" };
   }
   if (state.groupComplete && state.advanced) return { label: "Advanced", tone: "alive" };
+  if (state.live) return { label: "Playing now", tone: "alive" };
   if (state.gamesPlayed > 0 && state.rank)
     return { label: `Group: ${ordinal(state.rank)}`, tone: "neutral" };
   return { label: "Not started", tone: "neutral" };

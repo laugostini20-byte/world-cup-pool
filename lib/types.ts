@@ -50,6 +50,7 @@ export interface TeamState {
   reached: Record<RoundKey, boolean>; // which rounds the team appeared in
   wonFinal: boolean;
   eliminated: boolean;
+  live: boolean; // currently in an in-progress match
 }
 
 /** Point breakdown for one picked team. */
