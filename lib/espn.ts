@@ -10,9 +10,10 @@ import type {
   TeamState,
 } from "./types";
 
+import { cached } from "./cache";
+
 const BASE = "https://site.api.espn.com/apis";
 const LEAGUE = "soccer/fifa.world";
-const REVALIDATE = 60; // seconds
 
 // Fallback round windows (used if the live calendar can't be read). Sourced from ESPN's
 // FIFA World Cup 2026 calendar on 2026-06-05.
@@ -42,7 +43,9 @@ const yyyymmdd = (iso: string) => iso.slice(0, 10).replace(/-/g, "");
 
 async function getJson<T>(url: string): Promise<T | null> {
   try {
-    const res = await fetch(url, { next: { revalidate: REVALIDATE } });
+    // no-store: don't write to Next's Data Cache. Freshness is handled by our own
+    // in-memory cache around the higher-level fetchers (getScoreboard, etc.).
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch {
@@ -143,7 +146,11 @@ const ROUND_SEQUENCE: RoundKey[] = ["group", "r32", "r16", "qf", "sf", "third", 
 export const roundOrder = (r: RoundKey) => ROUND_SEQUENCE.indexOf(r);
 
 /** Fetch a single team's detail (identity, standing, full squad, coach) from ESPN. */
-export async function getTeamDetail(id: string): Promise<TeamDetail | null> {
+export function getTeamDetail(id: string): Promise<TeamDetail | null> {
+  return cached(`team:${id}`, 300_000, () => fetchTeamDetail(id));
+}
+
+async function fetchTeamDetail(id: string): Promise<TeamDetail | null> {
   const [info, roster] = await Promise.all([
     getJson<any>(`${BASE}/site/v2/sports/${LEAGUE}/teams/${id}`),
     getJson<any>(`${BASE}/site/v2/sports/${LEAGUE}/teams/${id}/roster`),
@@ -177,7 +184,11 @@ export async function getTeamDetail(id: string): Promise<TeamDetail | null> {
 }
 
 /** Fetch the real WC group tables (A–L) with full standings for display. */
-export async function getGroupTables(): Promise<GroupTable[]> {
+export function getGroupTables(): Promise<GroupTable[]> {
+  return cached("groupTables", 45_000, fetchGroupTables);
+}
+
+async function fetchGroupTables(): Promise<GroupTable[]> {
   const data = await getJson<any>(`${BASE}/v2/sports/${LEAGUE}/standings`);
   const groups = data?.children ?? [];
   const tables: GroupTable[] = [];

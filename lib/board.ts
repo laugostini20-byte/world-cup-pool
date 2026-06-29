@@ -1,4 +1,5 @@
 import { PARTICIPANTS } from "@/data/picks";
+import { cached } from "./cache";
 import { getAllMatches, getRoundWindows, getStandings } from "./espn";
 import { buildTeamStates, scoreParticipants } from "./scoring";
 import type { Match, Scoreboard } from "./types";
@@ -13,7 +14,11 @@ const etDate = (iso: string) =>
     day: "2-digit",
   }).format(new Date(iso));
 
-export async function getScoreboard(): Promise<Scoreboard> {
+export function getScoreboard(): Promise<Scoreboard> {
+  return cached("scoreboard", 45_000, buildScoreboard);
+}
+
+async function buildScoreboard(): Promise<Scoreboard> {
   const windows = await getRoundWindows();
   const [matches, standings] = await Promise.all([
     getAllMatches(windows),

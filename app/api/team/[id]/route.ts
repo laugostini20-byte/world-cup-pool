@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { getTeamDetail } from "@/lib/espn";
 
-// Squad/identity changes rarely — cache longer than the live scoreboard.
-export const revalidate = 300;
+// Dynamic + edge-cached; team detail is memoized in-memory for 5 min (lib/cache).
+export const dynamic = "force-dynamic";
 
 export async function GET(
   _req: Request,

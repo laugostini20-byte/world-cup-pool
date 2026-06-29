@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { getScoreboard } from "@/lib/board";
 
-// Cache the computed scoreboard for 60s so we never hammer ESPN and pages stay fast.
-export const revalidate = 60;
+// Dynamic + edge-cached via Cache-Control (no ISR writes). The scoreboard itself is
+// memoized in-memory (lib/cache) so ESPN isn't hammered and warm instances are instant.
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
