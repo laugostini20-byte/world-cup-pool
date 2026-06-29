@@ -11,6 +11,15 @@ import type {
   TeamState,
 } from "./types";
 
+// Winning a knockout match means you've reached the next round — detect this from the
+// match result rather than waiting for ESPN to publish the next round's fixture.
+const NEXT_ROUND: Partial<Record<RoundKey, RoundKey>> = {
+  r32: "r16",
+  r16: "qf",
+  qf: "sf",
+  sf: "final",
+};
+
 const EMPTY_REACHED: Record<RoundKey, boolean> = {
   group: false,
   r32: false,
@@ -58,7 +67,12 @@ export function buildTeamStates(
       if (typeof side.score === "number") st.goals += side.score;
       st.reached[m.round] = true;
       if (m.state === "in") st.live = true; // currently playing
-      if (m.round === "final" && m.state === "post" && side.winner) st.wonFinal = true;
+      if (m.state === "post" && side.winner) {
+        // Won this match → reached the next round (and won the Final → champion).
+        const next = NEXT_ROUND[m.round];
+        if (next) st.reached[next] = true;
+        if (m.round === "final") st.wonFinal = true;
+      }
     }
   }
 

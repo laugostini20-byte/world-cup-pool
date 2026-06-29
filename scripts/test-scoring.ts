@@ -120,5 +120,29 @@ function baseState(over: Partial<TeamState>): TeamState {
   expect("After a 2-way tie, next is #3", ranked[2].rank, 3);
 }
 
+// 9. Winning a knockout match marks the NEXT round reached — even before ESPN
+//    creates that round's fixture (the real bug: Brazil won R32 but had no R16 fixture yet).
+{
+  const side = (id: string, score: number, winner: boolean): MatchSide => ({
+    espnId: id, name: id, abbr: id, score, winner,
+  });
+  const mk = (id: string, round: RoundKey, h: MatchSide, a: MatchSide): Match => ({
+    id, date: "2026-06-28", round, state: "post", statusDetail: "FT", home: h, away: a,
+  });
+  const matches: Match[] = [
+    mk("g1", "group", side("205", 2, true), side("999", 0, false)), // Brazil group game
+    mk("r1", "r32", side("205", 2, true), side("888", 1, false)), // Brazil WINS R32, no R16 fixture exists
+  ];
+  const states = buildTeamStates(
+    { "205": { groupLetter: "C", groupPoints: 7, gamesPlayed: 3, groupComplete: true, rank: 1, advanced: true } },
+    matches,
+  );
+  expect("Win R32 -> reached R16 flag set", states["205"].reached.r16 ? 1 : 0, 1);
+  // goals 2+2=4, group pts 7, won group 8, reached R16 12 = 31
+  expect("Win R32 awards +12 (reached R16)", scoreTeam(states["205"], false).total, 4 + 7 + 8 + 12);
+  // The R32 loser only appeared in R32 — no R16, and eliminated.
+  expect("R32 loser did NOT reach R16", states["888"]?.reached.r16 ? 1 : 0, 0);
+}
+
 console.log(failures === 0 ? "\nALL PASS ✅" : `\n${failures} FAILURE(S) ❌`);
 process.exit(failures === 0 ? 0 : 1);
