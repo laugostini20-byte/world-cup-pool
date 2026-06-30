@@ -86,8 +86,18 @@ function parseSide(c: any): MatchSide {
   };
 }
 
-function mapState(name?: string): Match["state"] {
-  if (name === "STATUS_FINAL" || name === "STATUS_FULL_TIME") return "post";
+/**
+ * Map an ESPN status type to our match state. Prefer ESPN's own `state`/`completed`
+ * fields — they correctly cover finals decided on penalties (STATUS_FINAL_PEN) or after
+ * extra time, which name-only matching missed (those matches were skipped entirely).
+ */
+export function matchStateFromStatus(statusType: any): Match["state"] {
+  if (statusType?.completed === true || statusType?.state === "post") return "post";
+  if (statusType?.state === "in") return "in";
+  if (statusType?.state === "pre") return "pre";
+  // Fallback for payloads without a `state` field.
+  const name: string = statusType?.name ?? "";
+  if (name.startsWith("STATUS_FINAL") || name === "STATUS_FULL_TIME") return "post";
   if (
     name === "STATUS_IN_PROGRESS" ||
     name === "STATUS_HALFTIME" ||
@@ -111,7 +121,7 @@ function parseMatch(event: any, round: RoundKey): Match | null {
     id: String(event.id),
     date: event.date,
     round,
-    state: mapState(statusType?.name),
+    state: matchStateFromStatus(statusType),
     statusDetail: statusType?.shortDetail ?? statusType?.detail ?? "",
     home: parseSide(home),
     away: parseSide(away),

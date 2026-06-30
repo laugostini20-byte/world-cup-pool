@@ -3,6 +3,7 @@
  * Simulates synthetic tournament states and asserts the point math matches the rules.
  */
 import { buildTeamStates, scoreParticipants, scoreTeam } from "../lib/scoring";
+import { matchStateFromStatus } from "../lib/espn";
 import type { Match, MatchSide, RoundKey, TeamState } from "../lib/types";
 
 let failures = 0;
@@ -142,6 +143,17 @@ function baseState(over: Partial<TeamState>): TeamState {
   expect("Win R32 awards +12 (reached R16)", scoreTeam(states["205"], false).total, 4 + 7 + 8 + 12);
   // The R32 loser only appeared in R32 — no R16, and eliminated.
   expect("R32 loser did NOT reach R16", states["888"]?.reached.r16 ? 1 : 0, 0);
+}
+
+// 10. Match-state mapping: penalty/extra-time finals must count as "post", not be
+//     skipped (the Germany 1-1 Paraguay R32 was STATUS_FINAL_PEN and got dropped).
+{
+  const post = (st: object) => (matchStateFromStatus(st) === "post" ? 1 : 0);
+  expect("STATUS_FINAL_PEN -> post", post({ name: "STATUS_FINAL_PEN", state: "post", completed: true }), 1);
+  expect("STATUS_FULL_TIME -> post", post({ name: "STATUS_FULL_TIME", state: "post", completed: true }), 1);
+  expect("completed flag alone -> post", post({ name: "STATUS_FINAL_AET", completed: true }), 1);
+  expect("in-progress not post", post({ name: "STATUS_IN_PROGRESS", state: "in", completed: false }), 0);
+  expect("scheduled not post", post({ name: "STATUS_SCHEDULED", state: "pre", completed: false }), 0);
 }
 
 console.log(failures === 0 ? "\nALL PASS ✅" : `\n${failures} FAILURE(S) ❌`);
